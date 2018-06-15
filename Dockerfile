@@ -93,7 +93,7 @@ RUN cd acts-core/build/IntegrationTests                                        \
 # This is how the libm exclusion file was generated.
 RUN cd acts-core/build/IntegrationTests                                        \
     && chmod +x run.sh cmp.sh                                                  \
-    && VERROU_DD_NRUNS=10                                                      \
+    && VERROU_DD_NRUNS=4                                                       \
        VERROU_DD_NUM_THREADS=8                                                 \
        verrou_dd `pwd`/run.sh `pwd`/cmp.sh
 
