@@ -57,7 +57,7 @@ RUN cd valgrind                                                                \
     && make -C verrou/unitTest
 
 # Clean up after ourselves
-RUN cd valgrind && make clean
+RUN rm -rf valgrind
 
 
 # === FINAL CLEAN UP ===
