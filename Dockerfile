@@ -60,6 +60,45 @@ RUN cd valgrind                                                                \
 RUN rm -rf valgrind
 
 
+# === TEST ACTS WITH VERROU ===
+
+# Rebuild the ACTS unit and integration tests
+RUN cd acts-core/build && ninja
+
+# Bring the files needed for verrou-based testing
+COPY run.sh cmp.sh libm.ex /root/acts-core/build/IntegrationTests/
+
+# Run the ACTS unit tests inside of Verrou
+RUN cd acts-core/build                                                         \
+    && valgrind --tool=verrou                                                  \
+                --rounding-mode=random                                         \
+                --demangle=no                                                  \
+                --exclude=IntegrationTests/libm.ex                             \
+                ctest -j8
+
+# Run the ACTS integration tests inside of verrou
+RUN cd acts-core/build/IntegrationTests                                        \
+    && valgrind --tool=verrou                                                  \
+                --rounding-mode=random                                         \
+                --demangle=no                                                  \
+                --exclude=libm.ex                                              \
+                ./PropagationTests                                             \
+    && valgrind --tool=verrou                                                  \
+                --rounding-mode=random                                         \
+                --demangle=no                                                  \
+                --exclude=libm.ex                                              \
+                ./SeedingTest
+
+# Delta-debug the ACTS propagation to find its numerical instability regions.
+# This is how the libm exclusion file was generated.
+RUN cd acts-core/build/IntegrationTests                                        \
+    && chmod +x run.sh cmp.sh                                                  \
+    && verrou_dd `pwd`/run.sh `pwd`/cmp.sh
+
+# Clean up the ACTS build again to save space in the final image
+RUN cd acts-core/build && ninja clean
+
+
 # === FINAL CLEAN UP ===
 
 # Discard the system package cache to save up space
