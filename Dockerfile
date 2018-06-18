@@ -92,7 +92,7 @@ RUN cd acts-core/build/IntegrationTests                                        \
 # Delta-debug the ACTS propagation to find its numerical instability regions.
 # This is how the libm exclusion file was generated.
 #
-# NOTE: In principle, delta-debugging is able to go down to the granularity of
+# NOTE: In principle, delta-debugging should go down to the granularity of
 #       individual source lines, but this currently fails. I think that is
 #       because the instabilities are in the libm and I do not have debugging
 #       symbols for that. But since we already know that the libm trigonometric
