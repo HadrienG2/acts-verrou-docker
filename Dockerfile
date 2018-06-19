@@ -1,7 +1,7 @@
 # === DOCKER-SPECIFIC HACKERY ===
 
 FROM hgrasland/acts-tests:debug
-LABEL Description="openSUSE Tumbleweed with ACTS and Verrou" Version="0.1"
+LABEL Description="openSUSE Tumbleweed with ACTS and Verrou" Version="2.0"
 CMD bash
 
 
@@ -26,12 +26,8 @@ RUN zypper in -y patch
 RUN svn co --quiet svn://svn.valgrind.org/valgrind/tags/VALGRIND_3_13_0 valgrind
 
 # Download verrou and patch valgrind
-#
-# HACK: It seems stable verrou has some issues with long symbol names from g++,
-#       trying out a development branch which should address this.
-#
 RUN cd valgrind                                                                \
-    && git clone --branch=long_name --depth 1                                  \
+    && git clone --branch=v2.0.0 --depth 1                                     \
                  https://github.com/edf-hpc/verrou.git verrou                  \
     && patch -p0 < verrou/valgrind.diff
 
@@ -100,7 +96,10 @@ RUN cd acts-core/build/IntegrationTests                                        \
 #
 RUN cd acts-core/build/IntegrationTests                                        \
     && chmod +x run.sh cmp.sh                                                  \
-    && verrou_dd `pwd`/run.sh `pwd`/cmp.sh
+    && verrou_dd run.sh cmp.sh
+
+# Get rid of the largest delta-debugging artifacts
+RUN cd acts-core/build/IntegrationTests && rm -rf dd.sym
 
 # Clean up the ACTS build again to save space in the final image
 RUN cd acts-core/build && ninja clean
