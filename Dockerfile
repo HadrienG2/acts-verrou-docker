@@ -77,7 +77,7 @@ RUN cd acts-core/build                                                         \
                 --demangle=no                                                  \
                 --exclude=`pwd`/IntegrationTests/excludes.ex                   \
                 --trace-children=yes                                           \
-                ctest -j8
+                ctest -V
 
 # Run the ACTS integration tests inside of verrou
 RUN cd acts-core/build/IntegrationTests                                        \
