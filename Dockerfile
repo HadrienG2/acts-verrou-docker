@@ -58,8 +58,14 @@ RUN rm -rf valgrind
 
 # === TEST ACTS WITH VERROU ===
 
+# This work currently relies on a development branch of ACTS
+RUN cd acts-core                                                               \
+    && git remote add hgraslan https://gitlab.cern.ch/hgraslan/acts-core.git   \
+    && git fetch hgraslan                                                      \
+    && git checkout double-tests
+
 # Rebuild the ACTS unit and integration tests
-RUN cd acts-core/build && ninja
+RUN cd acts-core/build && cmake . && ninja
 
 # Bring the files needed for verrou-based testing
 COPY run.sh cmp.sh libm.ex /root/acts-core/build/IntegrationTests/
@@ -69,7 +75,8 @@ RUN cd acts-core/build                                                         \
     && valgrind --tool=verrou                                                  \
                 --rounding-mode=random                                         \
                 --demangle=no                                                  \
-                --exclude=IntegrationTests/libm.ex                             \
+                --exclude=`pwd`/IntegrationTests/libm.ex                       \
+                --trace-children=yes                                           \
                 ctest -j8
 
 # Run the ACTS integration tests inside of verrou
