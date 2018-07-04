@@ -68,14 +68,14 @@ RUN cd acts-core                                                               \
 RUN cd acts-core/build && cmake . && ninja
 
 # Bring the files needed for verrou-based testing
-COPY run.sh cmp.sh libm.ex /root/acts-core/build/IntegrationTests/
+COPY run.sh cmp.sh excludes.ex /root/acts-core/build/IntegrationTests/
 
 # Run the ACTS unit tests inside of Verrou
 RUN cd acts-core/build                                                         \
     && valgrind --tool=verrou                                                  \
                 --rounding-mode=random                                         \
                 --demangle=no                                                  \
-                --exclude=`pwd`/IntegrationTests/libm.ex                       \
+                --exclude=`pwd`/IntegrationTests/excludes.ex                   \
                 --trace-children=yes                                           \
                 ctest -j8
 
@@ -84,12 +84,12 @@ RUN cd acts-core/build/IntegrationTests                                        \
     && valgrind --tool=verrou                                                  \
                 --rounding-mode=random                                         \
                 --demangle=no                                                  \
-                --exclude=libm.ex                                              \
+                --exclude=excludes.ex                                          \
                 ./PropagationTests                                             \
     && valgrind --tool=verrou                                                  \
                 --rounding-mode=random                                         \
                 --demangle=no                                                  \
-                --exclude=libm.ex                                              \
+                --exclude=excludes.ex                                          \
                 ./SeedingTest
 
 # Delta-debug the ACTS propagation to find its numerical instability regions.
