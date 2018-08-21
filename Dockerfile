@@ -34,6 +34,10 @@ RUN echo "export VERROU_CMD_BASE=\"                                            \
          >> ${SETUP_ENV}
 
 # Run the ACTS test suite inside of Verrou, in verbose and single-thread mode
+#
+# FIXME: There are new failures here, likely caused by the enormous recent
+#        extrapolation merge request.
+#
 RUN cd ${ACTS_BUILD_DIR}                                                       \
     && spack env acts-core ${VERROU_CMD_BASE} --trace-children=yes ctest -V
 
@@ -50,6 +54,9 @@ RUN cd ${ACTS_BUILD_DIR}/IntegrationTests                                      \
 #       because the instabilities are in the libm and I do not have debugging
 #       symbols for that. But since we already know that the libm trigonometric
 #       function instabilities are a false alarm, this is not a big deal.
+#
+# FIXME: This is currently broken because verrou_dd has a hardcoded dependency
+#        on /usr/bin/python3.
 #
 RUN cd ${ACTS_BUILD_DIR}/IntegrationTests                                      \
     && chmod +x run.sh cmp.sh                                                  \
