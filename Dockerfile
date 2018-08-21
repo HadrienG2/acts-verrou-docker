@@ -19,7 +19,7 @@ RUN export ACTS_SOURCE_DIR=`spack location --build-dir ${ACTS_SPACK_SPEC}`     \
             >> ${SETUP_ENV}
 
 # Bring the files needed for verrou-based testing, fixing absolute file paths
-COPY run.sh cmp.sh excludes.ex /root
+COPY run.sh cmp.sh excludes.ex /root/
 RUN sed s#/root/acts-core/build#${ACTS_BUILD_DIR}#g excludes.ex                \
         > ${ACTS_BUILD_DIR}/excludes.ex                                        \
     && rm excludes.ex                                                          \
