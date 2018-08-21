@@ -58,6 +58,13 @@ RUN cd ${ACTS_BUILD_DIR}/IntegrationTests                                      \
 # FIXME: This is currently broken because verrou_dd has a hardcoded dependency
 #        on /usr/bin/python3.
 #
+#        To use verrou_dd, one currently needs the following hacks:
+#        - Modify hardcoded /usr/bin/python to /usr/bin/env python in verrou
+#        - Remove "python" symlink to python3 after verrou installation
+#        - Tweak verrou_dd's spack package to require python and add itself
+#          to the PYTHONPATH
+#        - Symlink the DD.py site package to the regular python lib directory
+#
 RUN cd ${ACTS_BUILD_DIR}/IntegrationTests                                      \
     && chmod +x run.sh cmp.sh                                                  \
     && spack env acts-core verrou_dd run.sh cmp.sh
