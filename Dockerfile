@@ -1,96 +1,46 @@
-# === DOCKER-SPECIFIC HACKERY ===
-
+# Configure the container's basic properties
 FROM hgrasland/acts-tests:debug
-LABEL Description="openSUSE Tumbleweed with ACTS and Verrou" Version="2.0"
+LABEL Description="openSUSE Tumbleweed with ACTS and Verrou" Version="develop"
 CMD bash
 
+# Install the development version of verrou
+RUN spack install verrou@develop
 
-# === SYSTEM SETUP ===
+# Schedule Verrou to be loaded during container startup
+RUN echo "spack load verrou" >> ${SETUP_ENV}
 
-# Update the host system
-RUN zypper ref && zypper dup -y
+# Bring back the ACTS build environment
+RUN spack uninstall -y ${ACTS_SPACK_SPEC} && spack build ${ACTS_SPACK_SPEC}
 
-# Install valgrind's run-time prerequisites (hack? what hack?)
-RUN zypper in -y valgrind valgrind-devel && zypper rm -y valgrind valgrind-devel
+# Cache the location of the ACTS build directory (it takes a while to compute)
+RUN export ACTS_SOURCE_DIR=`spack location --build-dir ${ACTS_SPACK_SPEC}`     \
+    && echo "export ACTS_SOURCE_DIR=${ACTS_SOURCE_DIR}" >> ${SETUP_ENV}        \
+    && echo "export ACTS_BUILD_DIR=${ACTS_SOURCE_DIR}/spack-build"             \
+            >> ${SETUP_ENV}
 
-# Install valgrind's additional build prerequisites
-RUN zypper in -y subversion automake which
+# Bring the files needed for verrou-based testing, fixing absolute file paths
+COPY run.sh cmp.sh excludes.ex /root
+RUN sed s#/root/acts-core/build#${ACTS_BUILD_DIR}#g excludes.ex                \
+        > ${ACTS_BUILD_DIR}/excludes.ex                                        \
+    && rm excludes.ex                                                          \
+    && mv run.sh cmp.sh ${ACTS_BUILD_DIR}/IntegrationTests
 
-# Install verrou's additional build prerequisites
-RUN zypper in -y patch
+# Record the part of the verrou command line which we'll use everywhere
+RUN echo "export VERROU_CMD_BASE=\"                                            \
+                     valgrind --tool=verrou                                    \
+                              --rounding-mode=random                           \
+                              --demangle=no                                    \
+                              --exclude=${ACTS_BUILD_DIR}/excludes.ex\""       \
+         >> ${SETUP_ENV}
 
+# Run the ACTS test suite inside of Verrou, in verbose and single-thread mode
+RUN cd ${ACTS_BUILD_DIR}                                                       \
+    && spack env acts-core ${VERROU_CMD_BASE} --trace-children=yes ctest -V
 
-# === INSTALL VERROU ===
-
-# Download the valgrind source code (currently using v3.13.0)
-RUN svn co --quiet svn://svn.valgrind.org/valgrind/tags/VALGRIND_3_13_0 valgrind
-
-# Download verrou and patch valgrind
-RUN cd valgrind                                                                \
-    && git clone --branch=v2.0.0 --depth 1                                     \
-                 https://github.com/edf-hpc/verrou.git verrou                  \
-    && patch -p0 < verrou/valgrind.diff
-
-# Configure valgrind
-#
-# NOTE: You may need to remove the --enable-verrou-fma switch if you are using
-#       an old CPU or virtual machine
-#
-RUN cd valgrind                                                                \
-    && ./autogen.sh                                                            \
-    && ./configure --enable-only64bit --enable-verrou-fma=yes
-
-# Build and install valgrind
-RUN cd valgrind                                                                \
-    && make -j8                                                                \
-    && make install
-
-# Run the verrou test suite to check that everything is fine
-RUN cd valgrind                                                                \
-    && make -C tests check                                                     \
-    && make -C verrou check                                                    \
-    && perl tests/vg_regtest verrou                                            \
-    && make -C verrou/unitTest
-
-# Clean up after ourselves
-RUN rm -rf valgrind
-
-
-# === TEST ACTS WITH VERROU ===
-
-# This work currently relies on a development branch of ACTS
-RUN cd acts-core                                                               \
-    && git remote add hgraslan https://gitlab.cern.ch/hgraslan/acts-core.git   \
-    && git fetch hgraslan                                                      \
-    && git checkout double-tests
-
-# Rebuild the ACTS unit and integration tests
-RUN cd acts-core/build && cmake . && ninja
-
-# Bring the files needed for verrou-based testing
-COPY run.sh cmp.sh excludes.ex /root/acts-core/build/IntegrationTests/
-
-# Run the ACTS unit tests inside of Verrou
-RUN cd acts-core/build                                                         \
-    && valgrind --tool=verrou                                                  \
-                --rounding-mode=random                                         \
-                --demangle=no                                                  \
-                --exclude=`pwd`/IntegrationTests/excludes.ex                   \
-                --trace-children=yes                                           \
-                ctest -V
-
-# Run the ACTS integration tests inside of verrou
-RUN cd acts-core/build/IntegrationTests                                        \
-    && valgrind --tool=verrou                                                  \
-                --rounding-mode=random                                         \
-                --demangle=no                                                  \
-                --exclude=excludes.ex                                          \
-                ./PropagationTests                                             \
-    && valgrind --tool=verrou                                                  \
-                --rounding-mode=random                                         \
-                --demangle=no                                                  \
-                --exclude=excludes.ex                                          \
-                ./SeedingTest
+# Run the integration tests inside of Verrou as well
+RUN cd ${ACTS_BUILD_DIR}/IntegrationTests                                      \
+    && spack env acts-core ${VERROU_CMD_BASE} ./PropagationTests               \
+    && spack env acts-core ${VERROU_CMD_BASE} ./SeedingTest
 
 # Delta-debug the ACTS propagation to find its numerical instability regions.
 # This is how the libm exclusion file was generated.
@@ -101,18 +51,16 @@ RUN cd acts-core/build/IntegrationTests                                        \
 #       symbols for that. But since we already know that the libm trigonometric
 #       function instabilities are a false alarm, this is not a big deal.
 #
-RUN cd acts-core/build/IntegrationTests                                        \
+RUN cd ${ACTS_BUILD_DIR}/IntegrationTests                                      \
     && chmod +x run.sh cmp.sh                                                  \
-    && verrou_dd run.sh cmp.sh
+    && spack env acts-core verrou_dd run.sh cmp.sh
 
 # Get rid of the largest delta-debugging artifacts
-RUN cd acts-core/build/IntegrationTests && rm -rf dd.sym
+RUN cd ${ACTS_BUILD_DIR}/IntegrationTests && rm -rf dd.sym
 
-# Clean up the ACTS build again to save space in the final image
-RUN cd acts-core/build && ninja clean
-
-
-# === FINAL CLEAN UP ===
-
-# Discard the system package cache to save up space
-RUN zypper clean
+# Discard the ACTS build directory and the associated environment setup
+RUN spack clean ${ACTS_SPACK_SPEC}                                             \
+    && mv ${SETUP_ENV} ${SETUP_ENV}.old                                        \
+    && grep -E --invert-match "ACTS_(SOURCE|BUILD)_DIR" ${SETUP_ENV}.old       \
+            >> ${SETUP_ENV}                                                    \
+    && rm ${SETUP_ENV}.old
