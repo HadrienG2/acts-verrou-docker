@@ -25,7 +25,11 @@ RUN zypper in -y binutils-gold && update-alternatives --set ld /usr/bin/ld.gold
 RUN spack uninstall -y ${ACTS_SPACK_SPEC} && spack build ${ACTS_SPACK_SPEC}
 
 # Cache the location of the ACTS build directory (it takes a while to compute)
-RUN export ACTS_SOURCE_DIR=`spack location --build-dir ${ACTS_SPACK_SPEC}`     \
+#
+# The symlink provided by spack must be resolved for Valgrind and Verrou to work
+#
+RUN export ACTS_SOURCE_SYMLINK=`spack location --build-dir ${ACTS_SPACK_SPEC}` \
+    && export ACTS_SOURCE_DIR=`readlink -e ${ACTS_SOURCE_SYMLINK}`             \
     && echo "export ACTS_SOURCE_DIR=${ACTS_SOURCE_DIR}" >> ${SETUP_ENV}        \
     && echo "export ACTS_BUILD_DIR=${ACTS_SOURCE_DIR}/spack-build"             \
             >> ${SETUP_ENV}
