@@ -9,6 +9,18 @@ RUN spack install verrou@develop
 # Schedule Verrou to be loaded during container startup
 RUN echo "spack load verrou" >> ${SETUP_ENV}
 
+# HACK: Use the gold linker, hiding this from Spack to avoid a full rebuild
+#
+#       This is done in order to work around an incompatibility between Valgrind
+#       3.13.0 and binutils 2.31, which causes Valgrind to fail to load
+#       debugging symbols and thus Verrou to fail at everything related to them
+#       (exclusions, delta-debugging...).
+#
+#       The problem should be fixed in Valgrind's master, so try to remove this
+#       hack once Valgrind 3.14 is out and Verrou has moved to it.
+#
+RUN zypper in -y binutils-gold && update-alternatives --set ld /usr/bin/ld.gold
+
 # Bring back the ACTS build environment
 RUN spack uninstall -y ${ACTS_SPACK_SPEC} && spack build ${ACTS_SPACK_SPEC}
 
