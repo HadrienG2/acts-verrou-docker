@@ -29,24 +29,13 @@ RUN zypper in -y binutils-gold && update-alternatives --set ld /usr/bin/ld.gold
 
 # Start working on a development branch of ACTS, uninstalling the system
 # version to shrink Docker image size
-#
-# NOTE: If you want to work on the official master branch of ACTS, you can
-#       download and build it with a simple "spack build ${ACTS_SPACK_SPEC}"
-#
 RUN spack uninstall -y ${ACTS_SPACK_SPEC}                                      \
     && git clone --branch=more-verrou-fixes                                    \
        https://gitlab.cern.ch/hgraslan/acts-core.git                           \
     && spack diy -d acts-core ${ACTS_SPACK_SPEC}
 
-# Cache the location of the ACTS build directory (it takes a while to compute)
-#
-# The symlink provided by spack must be resolved for Valgrind and Verrou to work
-#
-RUN export ACTS_SOURCE_SYMLINK=`spack location --build-dir ${ACTS_SPACK_SPEC}` \
-    && export ACTS_SOURCE_DIR=`readlink -e ${ACTS_SOURCE_SYMLINK}`             \
-    && echo "export ACTS_SOURCE_DIR=${ACTS_SOURCE_DIR}" >> ${SETUP_ENV}        \
-    && echo "export ACTS_BUILD_DIR=${ACTS_SOURCE_DIR}/spack-build"             \
-            >> ${SETUP_ENV}
+# Keep the location of the ACTS build directory around
+ENV ACTS_BUILD_DIR=/root/acts-core/spack-build
 
 
 # === TEST ACTS USING VERROU'S RANDOM-ROUNDING MODE ===
