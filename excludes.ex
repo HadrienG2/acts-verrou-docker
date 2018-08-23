@@ -1,8 +1,17 @@
+# These libm functions are known to fail under verrou due to range wrapping
 __sin_fma       /lib64/libm-2.27.so
 __cos_fma       /lib64/libm-2.27.so
 __tan_fma       /lib64/libm-2.27.so
 sincos  /lib64/libm-2.27.so
+
+# This should fail for the same reasons, but it seems we can get away without excluding it for now
 # _ZN4Acts6detail13wrap_periodicIdEET_S2_S2_S2_   /root/acts-core/build/Core/libActsCore.so
+
+# These exclusions handle a numerical instability in the setup of SurfaceArrayCreatorTests
 _ZN4Acts4Test26SurfaceArrayCreatorFixture17makeBarrelStaggerEiidddd     /root/acts-core/build/Tests/Tools/SurfaceArrayCreatorTests
 _ZN4Acts4Test26SurfaceArrayCreatorFixture22fullPhiTestSurfacesBRLEmddddd        /root/acts-core/build/Tests/Tools/SurfaceArrayCreatorTests
 _ZN4Acts4Test26SurfaceArrayCreatorFixture21fullPhiTestSurfacesECEmddddd /root/acts-core/build/Tests/Tools/SurfaceArrayCreatorTests
+
+# These exclusions handle a false positive in the conversion of CylinderLayer to variant_data and back
+_ZNK4Acts13CylinderLayer13toVariantDataB5cxx11Ev        /root/acts-core/build/Core/libActsCore.so
+_ZN4Acts13CylinderLayerC1ESt10shared_ptrIKN5Eigen9TransformIdLi3ELi2ELi0EEEES1_IKNS_14CylinderBoundsEESt10unique_ptrINS_12SurfaceArrayESt14default_deleteISB_EEdSA_INS_18ApproachDescriptorESC_ISF_EENS_9LayerTypeE     /root/acts-core/build/Core/libActsCore.so
