@@ -40,12 +40,9 @@ ENV ACTS_BUILD_DIR=/root/acts-core/spack-build
 
 # === TEST ACTS USING VERROU'S RANDOM-ROUNDING MODE ===
 
-# Bring the files needed for verrou-based testing, fixing absolute file paths
-COPY run.sh cmp.sh excludes.ex /root/
-RUN sed s#/root/acts-core/build#${ACTS_BUILD_DIR}#g excludes.ex                \
-        > ${ACTS_BUILD_DIR}/excludes.ex                                        \
-    && rm excludes.ex                                                          \
-    && mv run.sh cmp.sh ${ACTS_BUILD_DIR}/IntegrationTests
+# Bring in the files needed for verrou-based testing
+COPY excludes.ex ${ACTS_BUILD_DIR}/
+COPY run.sh cmp.sh ${ACTS_BUILD_DIR}/IntegrationTests/
 
 # Record the part of the verrou command line which we'll use everywhere
 RUN echo "export VERROU_CMD_BASE=\"                                            \
