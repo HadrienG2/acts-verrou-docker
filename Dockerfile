@@ -88,9 +88,5 @@ RUN cd ${ACTS_BUILD_DIR}/IntegrationTests                                      \
 # Get rid of the largest delta-debugging artifacts
 RUN cd ${ACTS_BUILD_DIR}/IntegrationTests && rm -rf dd.sym
 
-# Discard the ACTS build directory and the associated environment setup
-RUN spack clean ${ACTS_SPACK_SPEC}                                             \
-    && mv ${SETUP_ENV} ${SETUP_ENV}.old                                        \
-    && grep -E --invert-match "ACTS_(SOURCE|BUILD)_DIR" ${SETUP_ENV}.old       \
-            >> ${SETUP_ENV}                                                    \
-    && rm ${SETUP_ENV}.old
+# Discard the ACTS build directory to save space
+RUN rm -rf ${ACTS_BUILD_DIR}
