@@ -52,12 +52,13 @@ ENV VERROU_CMD_BASE="valgrind --tool=verrou                                    \
 
 # Run the ACTS test suite inside of Verrou, in verbose and single-thread mode
 RUN cd ${ACTS_BUILD_DIR}                                                       \
-    && spack env acts-core ${VERROU_CMD_BASE} --trace-children=yes ctest -V
+    && spack load cmake                                                        \
+    && ${VERROU_CMD_BASE} --trace-children=yes ctest -V
 
 # Run the integration tests inside of Verrou as well
 RUN cd ${ACTS_BUILD_DIR}/IntegrationTests                                      \
-    && spack env acts-core ${VERROU_CMD_BASE} ./PropagationTests               \
-    && spack env acts-core ${VERROU_CMD_BASE} ./SeedingTest
+    && ${VERROU_CMD_BASE} ./PropagationTests                                   \
+    && ${VERROU_CMD_BASE} ./SeedingTest
 
 # Delta-debug the ACTS propagation to find its numerical instability regions.
 # This is how the libm exclusion file was generated.
@@ -80,7 +81,7 @@ RUN cd ${ACTS_BUILD_DIR}/IntegrationTests                                      \
 #
 RUN cd ${ACTS_BUILD_DIR}/IntegrationTests                                      \
     && chmod +x run.sh cmp.sh                                                  \
-    && spack env acts-core verrou_dd run.sh cmp.sh
+    && verrou_dd run.sh cmp.sh
 
 
 # === CLEAN UP BEFORE PUSHING ===
