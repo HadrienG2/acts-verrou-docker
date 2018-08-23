@@ -7,6 +7,10 @@ CMD bash
 # === INSTALL VERROU ===
 
 # Install the development version of verrou
+#
+# TODO: Switch back to stable versions once they have all the features that we
+#       care about: "float" rounding mode, python 3 support, Valgrind 3.14+...
+#
 RUN spack install verrou@develop
 
 # Schedule Verrou to be loaded during container startup
