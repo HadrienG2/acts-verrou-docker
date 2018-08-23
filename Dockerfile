@@ -45,12 +45,10 @@ COPY excludes.ex ${ACTS_BUILD_DIR}/
 COPY run.sh cmp.sh ${ACTS_BUILD_DIR}/IntegrationTests/
 
 # Record the part of the verrou command line which we'll use everywhere
-RUN echo "export VERROU_CMD_BASE=\"                                            \
-                     valgrind --tool=verrou                                    \
+ENV VERROU_CMD_BASE="valgrind --tool=verrou                                    \
                               --rounding-mode=random                           \
                               --demangle=no                                    \
-                              --exclude=${ACTS_BUILD_DIR}/excludes.ex\""       \
-         >> ${SETUP_ENV}
+                              --exclude=${ACTS_BUILD_DIR}/excludes.ex"
 
 # Run the ACTS test suite inside of Verrou, in verbose and single-thread mode
 #
