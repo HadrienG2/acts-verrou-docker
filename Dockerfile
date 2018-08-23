@@ -3,6 +3,9 @@ FROM hgrasland/acts-tests:debug
 LABEL Description="openSUSE Tumbleweed with ACTS and Verrou" Version="develop"
 CMD bash
 
+
+# === INSTALL VERROU ===
+
 # Install the development version of verrou
 RUN spack install verrou@develop
 
@@ -20,6 +23,9 @@ RUN echo "spack load verrou" >> ${SETUP_ENV}
 #       hack once Valgrind 3.14 is out and Verrou has moved to it.
 #
 RUN zypper in -y binutils-gold && update-alternatives --set ld /usr/bin/ld.gold
+
+
+# === SETUP AN ACTS DEVELOPMENT ENVIRONMENT ===
 
 # Start working on a development branch of ACTS, uninstalling the system
 # version to shrink Docker image size
@@ -41,6 +47,9 @@ RUN export ACTS_SOURCE_SYMLINK=`spack location --build-dir ${ACTS_SPACK_SPEC}` \
     && echo "export ACTS_SOURCE_DIR=${ACTS_SOURCE_DIR}" >> ${SETUP_ENV}        \
     && echo "export ACTS_BUILD_DIR=${ACTS_SOURCE_DIR}/spack-build"             \
             >> ${SETUP_ENV}
+
+
+# === TEST ACTS USING VERROU'S RANDOM-ROUNDING MODE ===
 
 # Bring the files needed for verrou-based testing, fixing absolute file paths
 COPY run.sh cmp.sh excludes.ex /root/
@@ -92,6 +101,9 @@ RUN cd ${ACTS_BUILD_DIR}/IntegrationTests                                      \
 RUN cd ${ACTS_BUILD_DIR}/IntegrationTests                                      \
     && chmod +x run.sh cmp.sh                                                  \
     && spack env acts-core verrou_dd run.sh cmp.sh
+
+
+# === CLEAN UP BEFORE PUSHING ===
 
 # Get rid of the largest delta-debugging artifacts
 RUN cd ${ACTS_BUILD_DIR}/IntegrationTests && rm -rf dd.sym
