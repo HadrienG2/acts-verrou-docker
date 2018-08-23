@@ -51,10 +51,6 @@ ENV VERROU_CMD_BASE="valgrind --tool=verrou                                    \
                               --exclude=${ACTS_BUILD_DIR}/excludes.ex"
 
 # Run the ACTS test suite inside of Verrou, in verbose and single-thread mode
-#
-# FIXME: There are new failures here, likely caused by the enormous recent
-#        extrapolation merge request.
-#
 RUN cd ${ACTS_BUILD_DIR}                                                       \
     && spack env acts-core ${VERROU_CMD_BASE} --trace-children=yes ctest -V
 
