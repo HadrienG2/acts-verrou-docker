@@ -21,8 +21,16 @@ RUN echo "spack load verrou" >> ${SETUP_ENV}
 #
 RUN zypper in -y binutils-gold && update-alternatives --set ld /usr/bin/ld.gold
 
-# Bring back the ACTS build environment
-RUN spack uninstall -y ${ACTS_SPACK_SPEC} && spack build ${ACTS_SPACK_SPEC}
+# Start working on a development branch of ACTS, uninstalling the system
+# version to shrink Docker image size
+#
+# NOTE: If you want to work on the official master branch of ACTS, you can
+#       download and build it with a simple "spack build ${ACTS_SPACK_SPEC}"
+#
+RUN spack uninstall -y ${ACTS_SPACK_SPEC}                                      \
+    && git clone --branch=more-verrou-fixes                                    \
+       https://gitlab.cern.ch/hgraslan/acts-core.git                           \
+    && spack diy -d acts-core ${ACTS_SPACK_SPEC}
 
 # Cache the location of the ACTS build directory (it takes a while to compute)
 #
