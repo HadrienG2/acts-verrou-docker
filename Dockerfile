@@ -55,7 +55,7 @@ ENV ACTS_BUILD_DIR=/root/acts-core/spack-build
 
 # Bring in the files needed for verrou-based testing
 COPY excludes.ex ${ACTS_BUILD_DIR}/
-COPY run.sh cmp.sh ${ACTS_BUILD_DIR}/IntegrationTests/
+COPY run.sh cmp.sh ${ACTS_BUILD_DIR}/Tests/Integration/
 
 # Record the part of the verrou command line which we'll use everywhere
 ENV VERROU_CMD_BASE="valgrind --tool=verrou                                    \
@@ -69,7 +69,7 @@ RUN cd ${ACTS_BUILD_DIR}                                                       \
     && ${VERROU_CMD_BASE} --trace-children=yes ctest -V
 
 # Run the integration tests inside of Verrou as well
-RUN cd ${ACTS_BUILD_DIR}/IntegrationTests                                      \
+RUN cd ${ACTS_BUILD_DIR}/Tests/Integration                                      \
     && ${VERROU_CMD_BASE} ./PropagationTests                                   \
     && ${VERROU_CMD_BASE} ./SeedingTest
 
@@ -82,7 +82,7 @@ RUN cd ${ACTS_BUILD_DIR}/IntegrationTests                                      \
 #       symbols for that. But since we already know that the libm trigonometric
 #       function instabilities are a false alarm, this is not a big deal.
 #
-RUN cd ${ACTS_BUILD_DIR}/IntegrationTests                                      \
+RUN cd ${ACTS_BUILD_DIR}/Tests/Integration                                      \
     && chmod +x run.sh cmp.sh                                                  \
     && verrou_dd run.sh cmp.sh
 
@@ -90,7 +90,7 @@ RUN cd ${ACTS_BUILD_DIR}/IntegrationTests                                      \
 # === CLEAN UP BEFORE PUSHING ===
 
 # Get rid of the largest delta-debugging artifacts
-RUN cd ${ACTS_BUILD_DIR}/IntegrationTests && rm -rf dd.sym dd.line
+RUN cd ${ACTS_BUILD_DIR}/Tests/Integration && rm -rf dd.sym dd.line
 
 # Discard the ACTS build directory to save space
 RUN rm -rf ${ACTS_BUILD_DIR}
