@@ -18,10 +18,12 @@ RUN cd /opt/spack && git fetch HadrienG2 && git checkout acts-verrou
 # TODO: Switch back to stable versions once they have all the features that we
 #       care about: "float" rounding mode, python 3 support, Valgrind 3.14+...
 #
-RUN spack install verrou@develop
+RUN spack install verrou@develop ^ python -pythoncmd
 
-# Schedule Verrou to be loaded during container startup
-RUN echo "spack load verrou" >> ${SETUP_ENV}
+# Bring Python, Verrou, and Verrou's python extensions in global scope
+RUN spack activate verrou                                                      \
+    && echo "spack load python@3 -pythoncmd" >> ${SETUP_ENV}                   \
+    && echo "spack load verrou" >> ${SETUP_ENV}
 
 # HACK: Use the gold linker, hiding this from Spack to avoid a full rebuild
 #
@@ -82,8 +84,6 @@ RUN cd ${ACTS_BUILD_DIR}/IntegrationTests                                      \
 #
 RUN cd ${ACTS_BUILD_DIR}/IntegrationTests                                      \
     && chmod +x run.sh cmp.sh                                                  \
-    && spack load python@3                                                     \
-    && spack activate verrou                                                   \
     && verrou_dd run.sh cmp.sh
 
 
