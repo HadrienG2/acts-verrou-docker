@@ -1,6 +1,7 @@
 # These libm functions are known to fail under verrou due to range wrapping
 __cos_fma       /lib64/libm-2.27.so
 __dubsin_fma  /lib64/libm-2.27.so
+__ieee754_acos_fma    /lib64/libm-2.27.so
 __ieee754_atan2_fma   /lib64/libm-2.27.so
 __sin_fma       /lib64/libm-2.27.so
 __tan_fma       /lib64/libm-2.27.so
