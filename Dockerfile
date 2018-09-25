@@ -6,6 +6,13 @@ CMD bash
 
 # === INSTALL VERROU ===
 
+# Enable a spack development branch with verrou package improvements
+#
+# TODO: Remove this once the verrou improvements are merged into develop and the
+#       acts package branch has been updated accordingly.
+#
+RUN cd /opt/spack && git fetch HadrienG2 && git checkout acts-verrou
+
 # Install the development version of verrou
 #
 # TODO: Switch back to stable versions once they have all the features that we
@@ -73,18 +80,10 @@ RUN cd ${ACTS_BUILD_DIR}/IntegrationTests                                      \
 #       symbols for that. But since we already know that the libm trigonometric
 #       function instabilities are a false alarm, this is not a big deal.
 #
-# FIXME: This is currently broken because verrou_dd has a hardcoded dependency
-#        on /usr/bin/python3.
-#
-#        To use verrou_dd, one currently needs the following hacks:
-#        - Modify hardcoded /usr/bin/python to /usr/bin/env python in verrou
-#        - Remove "python" symlink to python3 after verrou installation
-#        - Tweak verrou_dd's spack package to require python and add itself
-#          to the PYTHONPATH
-#        - Symlink the DD.py site package to the regular python lib directory
-#
 RUN cd ${ACTS_BUILD_DIR}/IntegrationTests                                      \
     && chmod +x run.sh cmp.sh                                                  \
+    && spack load python@3                                                     \
+    && spack activate verrou                                                   \
     && verrou_dd run.sh cmp.sh
 
 
