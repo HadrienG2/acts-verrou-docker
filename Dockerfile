@@ -90,7 +90,7 @@ RUN cd ${ACTS_BUILD_DIR}/IntegrationTests                                      \
 # === CLEAN UP BEFORE PUSHING ===
 
 # Get rid of the largest delta-debugging artifacts
-RUN cd ${ACTS_BUILD_DIR}/IntegrationTests && rm -rf dd.sym
+RUN cd ${ACTS_BUILD_DIR}/IntegrationTests && rm -rf dd.sym dd.line
 
 # Discard the ACTS build directory to save space
 RUN rm -rf ${ACTS_BUILD_DIR}
