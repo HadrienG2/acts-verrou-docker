@@ -18,24 +18,12 @@ RUN cd /opt/spack && git fetch HadrienG2 && git checkout acts-verrou
 # TODO: Switch back to stable versions once they have all the features that we
 #       care about: "float" rounding mode, python 3 support, Valgrind 3.14+...
 #
-RUN spack install verrou@develop ^ python -pythoncmd
+RUN spack install verrou@valgrind-update ^ python -pythoncmd
 
 # Bring Python, Verrou, and Verrou's python extensions in global scope
 RUN spack activate verrou                                                      \
     && echo "spack load python@3 -pythoncmd" >> ${SETUP_ENV}                   \
     && echo "spack load verrou" >> ${SETUP_ENV}
-
-# HACK: Use the gold linker, hiding this from Spack to avoid a full rebuild
-#
-#       This is done in order to work around an incompatibility between Valgrind
-#       3.13.0 and binutils 2.31, which causes Valgrind to fail to load
-#       debugging symbols and thus Verrou to fail at everything related to them
-#       (exclusions, delta-debugging...).
-#
-#       The problem should be fixed in Valgrind's master, so try to remove this
-#       hack once Valgrind 3.14 is out and Verrou has moved to it.
-#
-RUN zypper in -y binutils-gold && update-alternatives --set ld /usr/bin/ld.gold
 
 
 # === SETUP AN ACTS DEVELOPMENT ENVIRONMENT ===
@@ -43,8 +31,7 @@ RUN zypper in -y binutils-gold && update-alternatives --set ld /usr/bin/ld.gold
 # Start working on a development branch of ACTS, uninstalling the system
 # version to shrink Docker image size
 RUN spack uninstall -y ${ACTS_SPACK_SPEC}                                      \
-    && git clone --branch=more-verrou-fixes                                    \
-       https://gitlab.cern.ch/hgraslan/acts-core.git                           \
+    && git clone https://gitlab.cern.ch/hgraslan/acts-core.git                 \
     && spack diy -d acts-core ${ACTS_SPACK_SPEC}
 
 # Keep the location of the ACTS build directory around
