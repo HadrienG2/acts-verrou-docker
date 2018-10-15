@@ -81,3 +81,6 @@ RUN cd ${ACTS_BUILD_DIR}/Tests/Integration && rm -rf dd.sym dd.line
 
 # Discard the ACTS build directory to save space
 RUN rm -rf ${ACTS_BUILD_DIR}
+
+# Discard the ACTS install, as otherwise user won't be able to rebuild another
+RUN spack uninstall -y ${ACTS_SPACK_SPEC}
