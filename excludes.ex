@@ -5,6 +5,7 @@ __ieee754_acos_fma    /lib64/libm-2.27.so
 __ieee754_atan2_fma   /lib64/libm-2.27.so
 __sin_fma       /lib64/libm-2.27.so
 __tan_fma       /lib64/libm-2.27.so
+__atan_fma      /lib64/libm-2.27.so
 sincos  /lib64/libm-2.27.so
 
 # This should fail for the same reasons, but it seems we can get away without excluding it for now
