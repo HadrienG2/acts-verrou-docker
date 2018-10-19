@@ -8,8 +8,9 @@ __tan_fma       /lib64/libm-2.27.so
 __atan_fma      /lib64/libm-2.27.so
 sincos  /lib64/libm-2.27.so
 
-# This libm function fails in "float" rounding mode for unclear reasons
+# These libm functions also fail in "float" rounding mode for unclear reasons
 __ieee754_exp_fma     /lib64/libm-2.27.so
+__fma_fma3            /lib64/libm-2.27.so
 
 # This should fail for the same reasons, but it seems we can get away without excluding it for now
 # _ZN4Acts6detail13wrap_periodicIdEET_S2_S2_S2_   /root/acts-core/spack-build/Core/libActsCore.so
