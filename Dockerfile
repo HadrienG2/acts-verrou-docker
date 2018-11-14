@@ -8,17 +8,12 @@ CMD bash
 
 # Enable a spack development branch with verrou package improvements
 #
-# TODO: Remove this once the verrou improvements are merged into develop and the
-#       acts package branch has been updated accordingly.
+# FIXME: Move back to official Spack repo once everything is upstreamed.
 #
 RUN cd /opt/spack && git fetch HadrienG2 && git checkout acts-verrou
 
-# Install the development version of verrou
-#
-# TODO: Switch back to stable versions once they have all the features that we
-#       care about: "float" rounding mode, python 3 support, Valgrind 3.14+...
-#
-RUN spack install verrou@valgrind-update ^ python -pythoncmd
+# Install Verrou
+RUN spack install verrou@2.1.0 ^ python -pythoncmd
 
 # Bring Python, Verrou, and Verrou's python extensions in global scope
 RUN spack activate verrou                                                      \
