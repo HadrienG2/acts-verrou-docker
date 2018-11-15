@@ -51,7 +51,7 @@ RUN cd ${ACTS_BUILD_DIR}                                                       \
     && ${VERROU_CMD_BASE} --trace-children=yes ctest -V
 
 # Run the integration tests inside of Verrou as well
-RUN cd ${ACTS_BUILD_DIR}/Tests/Integration                                      \
+RUN cd ${ACTS_BUILD_DIR}/Tests/Integration                                     \
     && ${VERROU_CMD_BASE} ./PropagationTests                                   \
     && ${VERROU_CMD_BASE} ./SeedingTest
 
@@ -64,7 +64,7 @@ RUN cd ${ACTS_BUILD_DIR}/Tests/Integration                                      
 #       symbols for that. But since we already know that the libm trigonometric
 #       function instabilities are a false alarm, this is not a big deal.
 #
-RUN cd ${ACTS_BUILD_DIR}/Tests/Integration                                      \
+RUN cd ${ACTS_BUILD_DIR}/Tests/Integration                                     \
     && chmod +x run.sh cmp.sh                                                  \
     && verrou_dd run.sh cmp.sh
 
