@@ -6,12 +6,6 @@ CMD bash
 
 # === INSTALL VERROU ===
 
-# Enable a spack development branch with verrou package improvements
-#
-# FIXME: Move back to official Spack repo once everything is upstreamed.
-#
-RUN cd /opt/spack && git fetch HadrienG2 && git checkout acts-verrou
-
 # Install Verrou
 RUN spack install verrou@2.1.0 ^ python -pythoncmd
 
