@@ -26,3 +26,6 @@ _ZN4Acts4Test26SurfaceArrayCreatorFixture21fullPhiTestSurfacesECEmddddd /root/ac
 # These exclusions handle a false positive in the conversion of CylinderLayer to variant_data and back
 _ZNK4Acts13CylinderLayer13toVariantDataB5cxx11Ev        /root/acts-core/spack-build/Core/libActsCore.so
 _ZN4Acts13CylinderLayerC1ERKSt10shared_ptrIKN5Eigen9TransformIdLi3ELi2ELi0EEEERKS1_IKNS_14CylinderBoundsEESt10unique_ptrINS_12SurfaceArrayESt14default_deleteISF_EEdSE_INS_18ApproachDescriptorESG_ISJ_EENS_9LayerTypeE /root/acts-core/spack-build/Core/libActsCore.so
+
+# This is an interesting false-positive. Basically, if we let Verrou instrument this function, then the Navigator can pick a wrong starting volume and get very confused.
+_ZNK4Acts11BinningData5valueERKN5Eigen6MatrixIdLi3ELi1ELi0ELi3ELi1EEE   /root/acts-core/spack-build/Tests/Core/Propagator/StepperTests
