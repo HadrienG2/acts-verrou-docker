@@ -8,6 +8,9 @@ __tan_fma       /lib64/libm-2.27.so
 __atan_fma      /lib64/libm-2.27.so
 sincos  /lib64/libm-2.27.so
 
+# This libm function also fails in double precision. Unclear why.
+__exp1_fma      /lib64/libm-2.27.so
+
 # These libm functions also fail in "float" rounding mode for unclear reasons
 __ieee754_exp_fma     /lib64/libm-2.27.so
 __fma_fma3            /lib64/libm-2.27.so
