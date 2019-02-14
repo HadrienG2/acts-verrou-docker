@@ -1,6 +1,4 @@
-# A dockerfile for Verrou studies on ACTS
+This repository is being superseded by a new unified repository containing all of my Spack-based Docker builds!
 
-This dockerfile is used to perform Verrou-based numerical studies on the ACTS
-codebase. It is based upon my previous work on dockerfiles for Verrou and ACTS.
+Find it at https://github.com/HadrienG2/spack-based-docker .
 
-You will find it on the docker Hub as hgrasland/acts-verrou-tests.
